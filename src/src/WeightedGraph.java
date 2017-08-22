@@ -26,8 +26,18 @@ public class WeightedGraph {
 			graph.addVertex(Integer.toString(i));
 		}
 
+		// Make sure every vertex has at least one edge.
+		for (int i = 0; i < theAmountVertices; i++) {
+			int m = getRandomVertexIndex(theAmountVertices);
+			if (m != i && !graph.containsEdge(Integer.toString(m), Integer.toString(i))) {
+				Edge edge = (Edge) graph.addEdge(Integer.toString(m), Integer.toString(i));
+				// Edge and Weight
+				graph.setEdgeWeight(edge, getRandomVertexIndex(theAmountVertices));
+			}
+		}
+		
 		// Generate Weight and adds to graph.
-		for (int i = 0; i < 10; i++) {
+		while (true) {
 			int m = getRandomVertexIndex(theAmountVertices);
 			int n = getRandomVertexIndex(theAmountVertices);
 			// if m and n aren't the same number and that edge doesn't exist in
