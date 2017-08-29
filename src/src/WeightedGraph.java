@@ -30,42 +30,10 @@ public class WeightedGraph {
 			return graph;
 		}
 
-		// Generate Edges
-		for (int i = 0; i < theNumbVertices; i++) {
-			graph.addVertex(Integer.toString(i));
-		}
+		// Generate Vertices
+		generateVertices(graph, theNumbVertices);
 
-		// Make sure every vertex has at least one edge.
-		int edges = 0;
-		int i = 0;
-		while (i < theNumbVertices) {
-			int m = Calculations.getRandomVertexIndexExcluding(theNumbVertices, i);
-			// if the vertex already has max edges, skip it.
-			if (Calculations.graphVertexHasMaxEdges(graph, theNumbVertices, i)) {
-				i++;
-			} else if (!Calculations.graphContainsUndirectedEdge(graph, m, i)) {
-				Edge edge = (Edge) graph.addEdge(Integer.toString(m), Integer.toString(i));
-				// Edge and Weight
-				graph.setEdgeWeight(edge, Calculations.getRandomWeight(1, theNumbVertices));
-				edges++;
-				i++;
-			}
-		}
-
-		// Generate Weight and adds to graph.
-		int totalEdges = Calculations.getRandomEdgeFromRange(theNumbVertices, GraphDensity.MEDIUM);
-		while (edges < totalEdges) {
-			int m = Calculations.getRandomVertexIndex(theNumbVertices);
-			int n = Calculations.getRandomVertexIndex(theNumbVertices);
-			// if m and n aren't the same number and that edge doesn't exist in
-			// the graph.
-			if (m != n && !graph.containsEdge(Integer.toString(m), Integer.toString(n))) {
-				Edge edge = (Edge) graph.addEdge(Integer.toString(m), Integer.toString(n));
-				// Edge and Weight
-				graph.setEdgeWeight(edge, Calculations.getRandomWeight(1, theNumbVertices));
-				edges++;
-			}
-		}
+		generateGraph(graph, theNumbVertices, 1, theNumbVertices, GraphDensity.MEDIUM);
 
 		return graph;
 	}
@@ -83,9 +51,26 @@ public class WeightedGraph {
 	 *            - Maximum weigh of an edge in a graph.
 	 * @return a Simple Weighted Graph.
 	 */
-	public static SimpleWeightedGraph<String, Edge> generateEdgeWeightedGraph(int theAmountVertices, int theMinWeight,
+	public static SimpleWeightedGraph<String, Edge> generateEdgeWeightedGraph(int theNumbVertices, int theMinWeight,
 			int theMaxWeight) {
 		SimpleWeightedGraph<String, Edge> graph = new SimpleWeightedGraph<String, Edge>(Edge.class);
+
+		if (theNumbVertices < 0) {
+			throw new InvalidParameterException();
+		}
+		if (theNumbVertices == 0) {
+			return graph;
+		}
+		if (theNumbVertices == 1) {
+			graph.addVertex(Integer.toString(0));
+			return graph;
+		}
+
+		// Generate Vertices
+		generateVertices(graph, theNumbVertices);
+
+		generateGraph(graph, theNumbVertices, theMinWeight, theMaxWeight, GraphDensity.MEDIUM);
+
 		return graph;
 	}
 
@@ -105,9 +90,26 @@ public class WeightedGraph {
 	 *            defaults to moderately dense.
 	 * @return
 	 */
-	public static SimpleWeightedGraph<String, Edge> generateEdgeWeightedGraph(int theAmountVertices, int theMinWeight,
-			int theMaxWeight, int theGraphDensity) {
+	public static SimpleWeightedGraph<String, Edge> generateEdgeWeightedGraph(int theNumbVertices, int theMinWeight,
+			int theMaxWeight, GraphDensity theGraphDensity) {
 		SimpleWeightedGraph<String, Edge> graph = new SimpleWeightedGraph<String, Edge>(Edge.class);
+
+		if (theNumbVertices < 0) {
+			throw new InvalidParameterException();
+		}
+		if (theNumbVertices == 0) {
+			return graph;
+		}
+		if (theNumbVertices == 1) {
+			graph.addVertex(Integer.toString(0));
+			return graph;
+		}
+
+		// Generate Vertices
+		generateVertices(graph, theNumbVertices);
+
+		generateGraph(graph, theNumbVertices, theMinWeight, theMaxWeight, theGraphDensity);
+
 		return graph;
 	}
 
@@ -127,15 +129,47 @@ public class WeightedGraph {
 	public static void main(String[] args) {
 		SimpleWeightedGraph<String, Edge> graph = generateEdgeWeightedGraph(4);
 		print(graph);
+	}
 
-		// for (int i = 1; i <= 8; i++) {
-		// System.out.println(Calculations.getMinEdges(i));
-		// System.out.println(Calculations.getQuartileOneNumbEdges(i));
-		// System.out.println(Calculations.getQuartileTwoNumbEdges(i));
-		// System.out.println(Calculations.getQuartileThreeNumbEdges(i));
-		// System.out.println(Calculations.getMaxEdges(i));
-		// System.out.println();
-		// }
+	private static void generateVertices(SimpleWeightedGraph<String, Edge> theGraph, int theNumbVertices) {
+		for (int i = 0; i < theNumbVertices; i++) {
+			theGraph.addVertex(Integer.toString(i));
+		}
+	}
+
+	private static void generateGraph(SimpleWeightedGraph<String, Edge> theGraph, int theNumbVertices, int theMinWeight,
+			int theMaxWeight, GraphDensity theGraphDensity) {
+		// Make sure every vertex has at least one edge.
+		int edges = 0;
+		int i = 0;
+		while (i < theNumbVertices) {
+			int m = Calculations.getRandomVertexIndexExcluding(theNumbVertices, i);
+			// if the vertex already has max edges, skip it.
+			if (Calculations.graphVertexHasMaxEdges(theGraph, theNumbVertices, i)) {
+				i++;
+			} else if (!Calculations.graphContainsUndirectedEdge(theGraph, m, i)) {
+				Edge edge = (Edge) theGraph.addEdge(Integer.toString(m), Integer.toString(i));
+				// Edge and Weight
+				theGraph.setEdgeWeight(edge, Calculations.getRandomWeight(theMinWeight, theMaxWeight));
+				edges++;
+				i++;
+			}
+		}
+
+		// Generate Weight and adds to graph.
+		int totalEdges = Calculations.getRandomEdgeFromRange(theNumbVertices, theGraphDensity);
+		while (edges < totalEdges) {
+			int m = Calculations.getRandomVertexIndex(theNumbVertices);
+			int n = Calculations.getRandomVertexIndex(theNumbVertices);
+			// if m and n aren't the same number and that edge doesn't exist in
+			// the graph.
+			if (m != n && !theGraph.containsEdge(Integer.toString(m), Integer.toString(n))) {
+				Edge edge = (Edge) theGraph.addEdge(Integer.toString(m), Integer.toString(n));
+				// Edge and Weight
+				theGraph.setEdgeWeight(edge, Calculations.getRandomWeight(theMinWeight, theMaxWeight));
+				edges++;
+			}
+		}
 	}
 
 }

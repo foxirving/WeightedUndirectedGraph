@@ -16,11 +16,11 @@ final public class Calculations {
 	public static boolean graphVertexHasMaxEdges(SimpleWeightedGraph<String, Edge>  theGraph, int theNumbvertices, int theVertex){
 		int edgeNumb = 0;
 		for (Edge edge : theGraph.edgeSet()) {
-			if (edge.getSourceVertex() == theVertex){
+			if (edge.getSourceVertex() == theVertex || edge.getTargetVertex() == theVertex){
 				edgeNumb++;
 			}
 		}
-		return edgeNumb == (theVertex -1);
+		return edgeNumb >= (theVertex - 1);
 	}
 
 	public static boolean graphContainsUndirectedEdge(SimpleWeightedGraph<String, Edge> theGraph, int theVertex1,
